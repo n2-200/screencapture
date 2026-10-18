@@ -239,6 +239,20 @@ export class LiveStreamRoom extends DurableObject<Env> {
     return success({});
   }
 
+  // status 只读房间状态（部署时以 Cloudflare WAF 限制为游戏服公网 IP, 见部署文档）
+  async status(): Promise<RoomResult<{ streamId: string; status: string; expiresAt: number; updatedAt: number; activeViewers: number }>> {
+    const stream = this.getStream();
+    if (!stream) return failure(404, 'Stream not found');
+    return success({
+      streamId: stream.stream_id,
+      status: stream.status,
+      expiresAt: stream.expires_at,
+      updatedAt: stream.updated_at,
+      activeViewers: this.activeViewerCount(),
+    });
+  }
+
+  
   async createViewerToken(ownerToken: string): Promise<RoomResult<ViewerTokenResult>> {
     const initialStream = this.getStream();
     if (!initialStream) return failure(401, 'Invalid owner capability');
