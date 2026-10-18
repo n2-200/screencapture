@@ -6,9 +6,6 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "upload_source_maps": true,
-  "secrets": {
-    "required": ["CALLS_APP_ID", "CALLS_APP_SECRET"]
-  },
   "durable_objects": {
     "bindings": [
       {
