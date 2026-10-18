@@ -39,8 +39,11 @@ export default {
       const streamId = segments[2];
       if (!STREAM_ID_PATTERN.test(streamId)) return json(400, { error: 'Invalid stream ID' });
       const room = env.LIVE_STREAM_ROOMS.getByName(streamId);
+      // status 只读房间状态（无鉴权, 部署时以 Cloudflare WAF 规则限制为游戏服公网 IP）
+      if (request.method === 'GET' && segments.length === 3) {
+        return roomResponse(await room.status());
+      }
       const token = bearerToken(request);
-
       if (request.method === 'DELETE' && segments.length === 3) {
         return roomResponse(await room.delete(token));
       }
