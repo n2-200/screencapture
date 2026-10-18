@@ -194,7 +194,8 @@ export class LiveStreamRoom extends DurableObject<Env> {
       if (oldPublisher) await this.closePublisher(realtime, oldPublisher);
 
       return success({ sessionDescription: response.sessionDescription });
-    } catch {
+    } catch (error) {
+      console.error('SFU publisher negotiation failed:', error instanceof Error ? error.message : String(error));
       if (oldPublisher) {
         await Promise.allSettled(retargetedViewers.map((viewer) => this.retargetViewer(
           realtime,
@@ -550,7 +551,8 @@ export class LiveStreamRoom extends DurableObject<Env> {
         expiresAt: stream.expires_at,
         sessionDescription: response.sessionDescription,
       });
-    } catch {
+    } catch (error) {
+      console.error('SFU viewer negotiation failed:', error instanceof Error ? error.message : String(error));
       if (sessionId) await realtime.closeTracks(sessionId, mids).catch(() => undefined);
       return failure(502, 'Media service could not connect the viewer');
     }
